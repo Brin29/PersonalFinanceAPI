@@ -3,6 +3,7 @@ import {
   CreateTransactionRequest,
   EditTransactionRequest,
   ListTransactionsRequest,
+  SummaryRequest,
   TransactionParamsRequest,
 } from "../dtos/transaction.dto";
 import {
@@ -12,7 +13,6 @@ import {
   getTransactionSummary,
   listTransactions,
 } from "../services/transaction.service";
-import { TransactionPeriod } from "../types/transaction.request";
 
 function getUserId(request: FastifyRequest) {
   return (request as any).user.id as string;
@@ -76,7 +76,7 @@ export async function getTransactionsHandler(
 }
 
 export async function getSummaryHandler(
-  request: FastifyRequest<{ Querystring: { period?: TransactionPeriod } }>,
+  request: FastifyRequest<SummaryRequest>,
   reply: FastifyReply,
 ) {
   const userId = getUserId(request);

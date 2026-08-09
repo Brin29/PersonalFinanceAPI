@@ -3,7 +3,7 @@ import fastifyOauth2, { type FastifyOAuth2Options } from "@fastify/oauth2";
 import type { FastifyPluginCallback } from "fastify";
 import fp from "fastify-plugin";
 import { env } from "../env";
-import { buildOAuthState, parseOAuthState } from "../utils/oauthState.utils";
+import { buildOAuthState } from "../utils/oauthState.utils";
 
 export default fp(async (fastify) => {
   fastify.register(fastifyOauth2 as FastifyPluginCallback<FastifyOAuth2Options>, {

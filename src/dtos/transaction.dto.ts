@@ -3,6 +3,7 @@ import {
   EditTransactionModel,
   ListTransactionsModel,
   TransactionParamsModel,
+  TransactionPeriod,
 } from "../types/transaction.request";
 import { Request } from "../types/request";
 
@@ -17,6 +18,10 @@ export interface EditTransactionRequest {
 
 export interface ListTransactionsRequest {
   Querystring: ListTransactionsModel;
+}
+
+export interface SummaryRequest {
+  Querystring: { period?: TransactionPeriod };
 }
 
 export interface TransactionParamsRequest {

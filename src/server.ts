@@ -17,6 +17,7 @@ import googleOAuth from "./plugins/googleOAuth";
 import githubOAuth from "./plugins/githubOAuth";
 import multipart from "./plugins/multipart";
 import cookie from "./plugins/cookie";
+import rateLimit from "./plugins/rateLimit";
 import { testCloudinary } from "./utils/cloudinary.utils";
 // import helmet from "./plugins/helmet";
 
@@ -33,6 +34,7 @@ const start = async () => {
   try {
     await fastify.register(cors);
     await fastify.register(cookie);
+    await fastify.register(rateLimit);
     await connectDatabase();
     await testCloudinary();
     await registerSwagger(fastify);

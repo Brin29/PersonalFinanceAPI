@@ -1,6 +1,4 @@
 import mongoose, { Schema, Model } from "mongoose";
-
-import bcrypt from "bcrypt";
 import { IMagicLink } from "../entities/magicLink.model";
 
 type MagicLinkModel = Model<IMagicLink, {}>;

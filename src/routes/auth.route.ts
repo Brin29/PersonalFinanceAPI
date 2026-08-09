@@ -16,7 +16,6 @@ import {
   authenticate,
 } from "../hooks/auth.hooks";
 import { GoogleCallBack, GithubCallBack } from "../controllers/auth.controller";
-import rateLimit from "@fastify/rate-limit";
 import {
   CheckEmailRequest,
   CodeGenerateRequest,

@@ -1,6 +1,6 @@
 import mongoose, { Schema, Model, HydratedDocument } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { IUser, IUserMethods } from '../models/user.model';
+import { IUser, IUserMethods } from '../entities/user.model';
 
 type UserModel = Model<IUser, {}, IUserMethods>;
 
@@ -33,6 +33,11 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>({
     type: String,
     required: true,
     select: false,
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
   },
   // isVerified: {
   //   type: Boolean,

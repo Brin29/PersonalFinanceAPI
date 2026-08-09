@@ -125,7 +125,12 @@ export async function GoogleCallBack(
     },
   );
 
-  const googleUser = await response.json();
+  const googleUser = (await response.json()) as {
+    email: string;
+    given_name: string;
+    family_name: string;
+    picture: string;
+  };
 
   const { tokens } = await loginWithGoogle(googleUser);
 

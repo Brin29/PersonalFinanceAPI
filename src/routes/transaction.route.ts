@@ -4,6 +4,7 @@ import {
   CreateTransactionRequest,
   EditTransactionRequest,
   ListTransactionsRequest,
+  SummaryRequest,
   TransactionParamsRequest,
 } from "../dtos/transaction.dto";
 import {
@@ -325,7 +326,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
     { schema: listTransactionsSchema, preHandler: authenticate },
     getTransactionsHandler,
   );
-  fastify.get(
+  fastify.get<SummaryRequest>(
     "/transactions/summary",
     { schema: summarySchema, preHandler: authenticate },
     getSummaryHandler,
