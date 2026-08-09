@@ -7,11 +7,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN pnpm ci
 
 COPY . .
 
-RUN npm run build
+RUN pnpm run build
 
 # Etapa de producción
 FROM node:22-alpine
@@ -22,7 +22,7 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+RUN pnpm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
