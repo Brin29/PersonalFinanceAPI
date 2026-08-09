@@ -9,10 +9,12 @@ WORKDIR /app
 RUN corepack enable
 
 # Copiar archivos de dependencias
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Instalar dependencias exactamente según el lockfile
-RUN pnpm install --frozen-lockfile
+RUN apk add --no-cache python3 make g++ \
+    && pnpm install --frozen-lockfile \
+    && apk del python3 make g++
 
 # Copiar código fuente
 COPY . .
@@ -34,10 +36,13 @@ ENV NODE_ENV=production
 RUN corepack enable
 
 # Copiar archivos de dependencias
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Instalar solamente dependencias de producción
-RUN pnpm install --frozen-lockfile --prod
+# bcrypt necesita herramientas de compilación en Alpine (no hay prebuilds para musl)
+RUN apk add --no-cache python3 make g++ \
+    && pnpm install --frozen-lockfile --prod \
+    && apk del python3 make g++
 
 # Copiar aplicación compilada
 COPY --from=builder /app/dist ./dist
