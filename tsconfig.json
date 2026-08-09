@@ -12,7 +12,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "noEmit": true
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
   "include": ["src"]
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/server.ts",
-    "build": "tsc",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -35,7 +35,8 @@
     "fastify-plugin": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.1",
-    "nodemailer": "^9.0.4"
+    "nodemailer": "^9.0.4",
+    "tsx": "^4.23.8"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -44,7 +45,6 @@
     "@types/nodemailer": "^8.0.1",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
-    "tsx": "^4.23.8",
     "typescript": "^7.0.2"
   }
 }

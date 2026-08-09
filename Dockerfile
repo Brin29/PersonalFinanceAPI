@@ -53,4 +53,4 @@ EXPOSE 3000
 # Ejecutar como usuario no root
 USER node
 
-CMD ["node", "dist/server.js"]
+CMD ["node", "--import", "tsx", "dist/server.js"]
