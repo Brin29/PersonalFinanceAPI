@@ -14,7 +14,7 @@ function cookieOptions(maxAge: number) {
   return {
     path: "/",
     httpOnly: true,
-    domain: "https://personal-finance-tracker-sepia-rho.vercel.app",
+    domain: ".vercel.app",
     signed: true,
     secure: isProduction,
     sameSite: (isProduction ? "none" : "lax") as "none" | "lax",
