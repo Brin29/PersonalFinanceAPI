@@ -7,10 +7,10 @@ import {
   ListTransactionsModel,
   TransactionPeriod,
 } from "../types/transaction.request";
+import { AppError } from "../errors/app.error";
 
 function toObjectId(id: string) {
-  if (!Types.ObjectId.isValid(id))
-    throw { status: 400, message: "ID inválido" };
+  if (!Types.ObjectId.isValid(id)) throw new AppError("INVALID_ID");
   return new Types.ObjectId(id);
 }
 
@@ -33,7 +33,7 @@ function getPeriodCutoff(period: TransactionPeriod): Date {
       return cutoff;
     }
     default:
-      throw { status: 400, message: "Período inválido" };
+      throw new AppError("INVALID_PERIOD");
   }
 }
 
@@ -71,10 +71,7 @@ export async function editTransaction(
   if (data.date !== undefined) updateData.date = new Date(data.date);
 
   if (Object.keys(updateData).length === 0)
-    throw {
-      status: 400,
-      message: "Debe proporcionar al menos un campo para actualizar",
-    };
+    throw new AppError("NO_FIELDS_TO_UPDATE");
 
   const transaction = await Transaction.findOneAndUpdate(
     { _id: toObjectId(transactionId), user: toObjectId(userId) },
@@ -82,8 +79,7 @@ export async function editTransaction(
     { returnDocument: "after" },
   );
 
-  if (!transaction)
-    throw { status: 404, message: "Transacción no encontrada" };
+  if (!transaction) throw new AppError("TRANSACTION_NOTFOUND");
 
   return { transaction };
 }
@@ -97,8 +93,7 @@ export async function deleteTransaction(
     user: toObjectId(userId),
   });
 
-  if (!transaction)
-    throw { status: 404, message: "Transacción no encontrada" };
+  if (!transaction) throw new AppError("TRANSACTION_NOTFOUND");
 
   return { transaction };
 }

@@ -11,6 +11,7 @@ import {
   editCategoryHandler,
   getCategoriesHandler,
 } from "../controllers/category.controller";
+import { errorResponseSchema } from "../errors/responseCodes";
 
 const categoryObject = {
   type: "object",
@@ -35,12 +36,12 @@ const errorResponses = {
   401: {
     description: "Token inválido o no proporcionado",
     type: "object",
-    properties: { error: { type: "string" } },
+    properties: errorResponseSchema.properties,
   },
   404: {
     description: "Categoría no encontrada",
     type: "object",
-    properties: { error: { type: "string" } },
+    properties: errorResponseSchema.properties,
   },
 };
 
@@ -54,6 +55,8 @@ const listCategoriesSchema = {
       description: "Lista de categorías",
       type: "object",
       properties: {
+        code: { type: "string" },
+        message: { type: "string" },
         categories: {
           type: "array",
           items: categoryObject,
@@ -99,6 +102,7 @@ const createCategorySchema = {
       description: "Categoría creada",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         category: categoryObject,
       },
@@ -106,12 +110,12 @@ const createCategorySchema = {
     400: {
       description: "Error de validación",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -156,6 +160,7 @@ const editCategorySchema = {
       description: "Categoría actualizada",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         category: categoryObject,
       },
@@ -163,17 +168,17 @@ const editCategorySchema = {
     400: {
       description: "Error de validación",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     404: {
       description: "Categoría no encontrada",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -194,17 +199,20 @@ const deleteCategorySchema = {
     200: {
       description: "Categoría eliminada",
       type: "object",
-      properties: { message: { type: "string" } },
+      properties: {
+        code: { type: "string" },
+        message: { type: "string" },
+      },
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     404: {
       description: "Categoría no encontrada",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };

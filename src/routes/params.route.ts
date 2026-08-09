@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { authenticate } from "../hooks/auth.hooks";
 import { getParamsHandler } from "../controllers/params.controller";
+import { errorResponseSchema } from "../errors/responseCodes";
 
 const authSecurity = [
   {
@@ -17,6 +18,8 @@ const paramsSchema = {
       description: "Parámetros del sistema",
       type: "object",
       properties: {
+        code: { type: "string" },
+        message: { type: "string" },
         categories: {
           type: "array",
           items: {
@@ -53,7 +56,7 @@ const paramsSchema = {
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };

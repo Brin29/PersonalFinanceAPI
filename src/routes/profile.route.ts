@@ -6,6 +6,7 @@ import {
   editProfile,
   getProfile,
 } from "../controllers/profile.controller";
+import { errorResponseSchema } from "../errors/responseCodes";
 
 const profileSchema = {
   description: "Obtener perfil del usuario autenticado",
@@ -38,7 +39,8 @@ const profileSchema = {
       description: "Token inválido o no proporcionado",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -70,6 +72,7 @@ const editProfileSchema = {
       description: "Perfil actualizado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         user: {
           type: "object",
@@ -89,14 +92,16 @@ const editProfileSchema = {
       description: "Error de validación",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -127,6 +132,7 @@ const changeAvatarSchema = {
       description: "Avatar actualizado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         user: {
           type: "object",
@@ -145,12 +151,12 @@ const changeAvatarSchema = {
     400: {
       description: "Error de validación o archivo inválido",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };

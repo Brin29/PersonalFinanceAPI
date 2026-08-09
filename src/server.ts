@@ -19,15 +19,42 @@ import multipart from "./plugins/multipart";
 import cookie from "./plugins/cookie";
 import rateLimit from "./plugins/rateLimit";
 import { testCloudinary } from "./utils/cloudinary.utils";
+import { AppError } from "./errors/app.error";
+import { ERROR_CODES } from "./errors/responseCodes";
 // import helmet from "./plugins/helmet";
 
 const fastify = Fastify({ logger: true });
 
 fastify.setErrorHandler((error: any, _, reply) => {
-  const status = error.status ?? error.statusCode ?? 500;
-  const message = error.message ?? "Error interno del servidor";
+  if (error instanceof AppError) {
+    return reply.status(error.status).send({
+      code: error.code,
+      message: error.message,
+    });
+  }
 
-  reply.status(status).send({ error: message });
+  if (error.validation) {
+    return reply.status(ERROR_CODES.VALIDATION_ERROR.status).send({
+      code: ERROR_CODES.VALIDATION_ERROR.code,
+      message: ERROR_CODES.VALIDATION_ERROR.message,
+    });
+  }
+
+  const statusCode = error.status ?? error.statusCode;
+
+  if (statusCode === 429) {
+    return reply.status(429).send({
+      code: ERROR_CODES.RATE_LIMIT_EXCEEDED.code,
+      message: ERROR_CODES.RATE_LIMIT_EXCEEDED.message,
+    });
+  }
+
+  reply.log.error(error);
+
+  return reply.status(ERROR_CODES.INTERNAL_ERROR.status).send({
+    code: ERROR_CODES.INTERNAL_ERROR.code,
+    message: ERROR_CODES.INTERNAL_ERROR.message,
+  });
 });
 
 const start = async () => {

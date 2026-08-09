@@ -6,6 +6,7 @@ import {
   ACCESS_TOKEN_COOKIE,
   VERIFICATION_TOKEN_COOKIE,
 } from "../utils/cookie.utils";
+import { ERROR_CODES } from "../errors/responseCodes";
 
 function extractBearerToken(request: FastifyRequest): string | null {
   const authHeader = request.headers.authorization;
@@ -24,14 +25,20 @@ export async function authenticate(
     extractBearerToken(request);
 
   if (!token) {
-    return reply.status(401).send({ error: "Token no proporcionado" });
+    return reply.status(ERROR_CODES.TOKEN_REQUIRED.status).send({
+      code: ERROR_CODES.TOKEN_REQUIRED.code,
+      message: ERROR_CODES.TOKEN_REQUIRED.message,
+    });
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     (request as any).user = decoded;
   } catch (error) {
-    return reply.status(401).send({ error: "Token inválido o expirado" });
+    return reply.status(ERROR_CODES.INVALID_TOKEN.status).send({
+      code: ERROR_CODES.INVALID_TOKEN.code,
+      message: ERROR_CODES.INVALID_TOKEN.message,
+    });
   }
 }
 
@@ -44,8 +51,9 @@ export async function verifyVerificationToken(
     extractBearerToken(request);
 
   if (!token) {
-    return reply.status(401).send({
-      error: "Token requerido",
+    return reply.status(ERROR_CODES.TOKEN_REQUIRED.status).send({
+      code: ERROR_CODES.TOKEN_REQUIRED.code,
+      message: ERROR_CODES.TOKEN_REQUIRED.message,
     });
   }
 
@@ -53,8 +61,9 @@ export async function verifyVerificationToken(
     const decoded = jwt.verify(token, JWT_SECRET);
     (request as any).verification = decoded;
   } catch {
-    return reply.status(401).send({
-      error: "Token inválido o expirado",
+    return reply.status(ERROR_CODES.INVALID_TOKEN.status).send({
+      code: ERROR_CODES.INVALID_TOKEN.code,
+      message: ERROR_CODES.INVALID_TOKEN.message,
     });
   }
 }

@@ -9,6 +9,7 @@ import {
   SYSTEM_CATEGORIES,
   SYSTEM_CATEGORY_KEYS,
 } from "../types/category.request";
+import { AppError } from "../errors/app.error";
 
 type CategoryDoc = ICategory & {
   _id: Types.ObjectId;
@@ -27,8 +28,7 @@ export interface CategoryResponse {
 }
 
 function toObjectId(id: string) {
-  if (!Types.ObjectId.isValid(id))
-    throw { status: 400, message: "ID inválido" };
+  if (!Types.ObjectId.isValid(id)) throw new AppError("INVALID_ID");
   return new Types.ObjectId(id);
 }
 
@@ -137,10 +137,9 @@ export async function createCategory(
 ) {
   const type = data.type ?? "expense";
   if (!CATEGORY_TYPES.includes(type))
-    throw {
-      status: 400,
+    throw new AppError("INVALID_CATEGORY_TYPE", {
       message: `Tipo de categoría inválido. Valores permitidos: ${CATEGORY_TYPES.join(", ")}`,
-    };
+    });
 
   const key = await generateUniqueKey(userId, data.name);
 
@@ -162,24 +161,16 @@ export async function editCategory(
   data: EditCategoryModel,
 ) {
   if (data.name === undefined || data.name === "")
-    throw {
-      status: 400,
-      message: "Debe proporcionar un nombre para actualizar",
-    };
+    throw new AppError("CATEGORY_NAME_REQUIRED");
 
   if (data.type !== undefined && !CATEGORY_TYPES.includes(data.type))
-    throw {
-      status: 400,
+    throw new AppError("INVALID_CATEGORY_TYPE", {
       message: `Tipo de categoría inválido. Valores permitidos: ${CATEGORY_TYPES.join(", ")}`,
-    };
+    });
 
   const category = await Category.findById(toObjectId(categoryId)).lean();
 
-  if (!category)
-    throw {
-      status: 404,
-      message: "Categoría no encontrada",
-    };
+  if (!category) throw new AppError("CATEGORY_NOTFOUND");
 
   if (category.isSystem) {
     const override = await Category.findOneAndUpdate(
@@ -213,11 +204,7 @@ export async function editCategory(
     { returnDocument: "after" },
   ).lean();
 
-  if (!updated)
-    throw {
-      status: 404,
-      message: "Categoría no encontrada o no se puede editar",
-    };
+  if (!updated) throw new AppError("CATEGORY_NOT_EDITABLE");
 
   return { category: toResponseCategory(updated) };
 }
@@ -225,11 +212,7 @@ export async function editCategory(
 export async function deleteCategory(userId: string, categoryId: string) {
   const category = await Category.findById(toObjectId(categoryId)).lean();
 
-  if (!category)
-    throw {
-      status: 404,
-      message: "Categoría no encontrada",
-    };
+  if (!category) throw new AppError("CATEGORY_NOTFOUND");
 
   if (category.isSystem) {
     await Category.updateOne(
@@ -258,11 +241,7 @@ export async function deleteCategory(userId: string, categoryId: string) {
     isSystem: false,
   }).lean();
 
-  if (!deleted)
-    throw {
-      status: 404,
-      message: "Categoría no encontrada o no se puede eliminar",
-    };
+  if (!deleted) throw new AppError("CATEGORY_NOT_DELETABLE");
 
   return { category: toResponseCategory(deleted) };
 }
@@ -278,9 +257,5 @@ export async function resolveCategoryKey(
     key,
   });
 
-  if (!exists)
-    throw {
-      status: 400,
-      message: "Categoría inválida o no pertenece al usuario",
-    };
+  if (!exists) throw new AppError("INVALID_CATEGORY");
 }

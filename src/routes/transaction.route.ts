@@ -14,6 +14,7 @@ import {
   getSummaryHandler,
   getTransactionsHandler,
 } from "../controllers/transaction.controller";
+import { errorResponseSchema } from "../errors/responseCodes";
 
 const transactionObject = {
   type: "object",
@@ -66,6 +67,8 @@ const listTransactionsSchema = {
       description: "Lista de transacciones",
       type: "object",
       properties: {
+        code: { type: "string" },
+        message: { type: "string" },
         transactions: {
           type: "array",
           items: transactionObject,
@@ -84,7 +87,7 @@ const listTransactionsSchema = {
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -109,6 +112,8 @@ const summarySchema = {
       description: "Resumen financiero",
       type: "object",
       properties: {
+        code: { type: "string" },
+        message: { type: "string" },
         summary: {
           type: "object",
           properties: {
@@ -153,7 +158,7 @@ const summarySchema = {
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -208,6 +213,7 @@ const createTransactionSchema = {
       description: "Transacción creada",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         transaction: transactionObject,
       },
@@ -215,12 +221,12 @@ const createTransactionSchema = {
     400: {
       description: "Error de validación",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -268,6 +274,7 @@ const editTransactionSchema = {
       description: "Transacción actualizada",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         transaction: transactionObject,
       },
@@ -275,17 +282,17 @@ const editTransactionSchema = {
     400: {
       description: "Error de validación",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     404: {
       description: "Transacción no encontrada",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -305,17 +312,20 @@ const deleteTransactionSchema = {
     200: {
       description: "Transacción eliminada",
       type: "object",
-      properties: { message: { type: "string" } },
+      properties: {
+        code: { type: "string" },
+        message: { type: "string" },
+      },
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     404: {
       description: "Transacción no encontrada",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };

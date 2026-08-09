@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import User from "../schema/user.schema";
 import { EditProfileRequest } from "../dtos/auth.dto";
 import { editUserProfile, changeUserAvatar } from "../services/auth.service";
+import { ERROR_CODES, SUCCESS_CODES } from "../errors/responseCodes";
 
 export async function getProfile(request: FastifyRequest, reply: FastifyReply) {
   const { id } = (request as any).user;
@@ -9,10 +10,15 @@ export async function getProfile(request: FastifyRequest, reply: FastifyReply) {
   const user = await User.findById(id);
 
   if (!user) {
-    return reply.status(404).send({ error: "Usuario no encontrado" });
+    return reply.status(ERROR_CODES.USER_NOTFOUND.status).send({
+      code: ERROR_CODES.USER_NOTFOUND.code,
+      message: ERROR_CODES.USER_NOTFOUND.message,
+    });
   }
 
   return reply.send({
+    code: SUCCESS_CODES.PROFILE_FETCHED.code,
+    message: SUCCESS_CODES.PROFILE_FETCHED.message,
     user: {
       id: user._id,
       firstName: user.firstName,
@@ -35,7 +41,8 @@ export async function editProfile(
   const { user } = await editUserProfile(id, firstName, lastName);
 
   return reply.send({
-    message: "Perfil actualizado exitosamente",
+    code: SUCCESS_CODES.PROFILE_UPDATED.code,
+    message: SUCCESS_CODES.PROFILE_UPDATED.message,
     user: {
       id: user._id,
       firstName: user.firstName,
@@ -61,7 +68,8 @@ export async function changeAvatar(
   const { user } = await changeUserAvatar(id, buffer, mimeType);
 
   return reply.send({
-    message: "Avatar actualizado exitosamente",
+    code: SUCCESS_CODES.AVATAR_UPDATED.code,
+    message: SUCCESS_CODES.AVATAR_UPDATED.message,
     user: {
       id: user._id,
       firstName: user.firstName,

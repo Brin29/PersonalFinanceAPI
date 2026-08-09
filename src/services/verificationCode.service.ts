@@ -4,22 +4,20 @@ import User from "../schema/user.schema";
 import VerificationToken from "../schema/verification-token.schema";
 import { EmailService } from "../utils/email.utils";
 import { JWT_SECRET } from "../utils/token.utils";
+import { AppError } from "../errors/app.error";
 
 export async function verificationCode(email: string, code: string) {
   const verification = await VerificationToken.findOne({ email }).select(
     "+code",
   );
 
-  if (!verification) throw { statu: 400, message: "Código inválido o expirado." };
+  if (!verification) throw new AppError("CODE_INVALID_OR_EXPIRED");
 
   if (verification.attempts >= 5) {
     await VerificationToken.deleteOne({
       email,
     });
-    throw {
-      status: 429,
-      message: "Demasiados intentos. Solicita un nuevo código.",
-    };
+    throw new AppError("CODE_TOO_MANY_ATTEMPTS");
   }
 
   const isValid = await verification.compareCode(code);
@@ -33,7 +31,7 @@ export async function verificationCode(email: string, code: string) {
         },
       },
     );
-    throw { status: 400, message: "Código inválido" };
+    throw new AppError("CODE_INVALID");
   }
 
   await VerificationToken.deleteOne({
@@ -56,11 +54,7 @@ export async function verificationCode(email: string, code: string) {
 
 export async function generateCode(email: string) {
   const existingUser = await User.findOne({ email });
-  if (existingUser)
-    throw {
-      status: 400,
-      message: "Hubo un error el sistema no pudo generar el codigo",
-    };
+  if (existingUser) throw new AppError("EMAIL_ALREADY_REGISTERED");
 
   await VerificationToken.deleteOne({
     email,

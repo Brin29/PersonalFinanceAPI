@@ -16,6 +16,7 @@ import {
   authenticate,
 } from "../hooks/auth.hooks";
 import { GoogleCallBack, GithubCallBack } from "../controllers/auth.controller";
+import { errorResponseSchema } from "../errors/responseCodes";
 import {
   CheckEmailRequest,
   CodeGenerateRequest,
@@ -55,6 +56,7 @@ const registerSchema = {
       description: "Usuario registrado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         user: {
           type: "object",
@@ -72,7 +74,8 @@ const registerSchema = {
       description: "Error de validación",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -104,6 +107,7 @@ const loginSchema = {
       description: "Inicio de sesión exitoso",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         user: {
           type: "object",
@@ -123,7 +127,8 @@ const loginSchema = {
       description: "Credenciales inválidas",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -152,12 +157,14 @@ const requestCodeSchema = {
       description: "Código enviado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: {
           type: "string",
           example: "Verification code sent successfully",
         },
-        code: {
+        otpCode: {
           type: "string",
+          description: "Código de verificación de 6 dígitos",
         },
       },
     },
@@ -165,9 +172,8 @@ const requestCodeSchema = {
       description: "El email ya está registrado",
       type: "object",
       properties: {
-        error: {
-          type: "string",
-        },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
     // 409: {
@@ -219,6 +225,7 @@ const verifyCodeSchema = {
       description: "Codigo verificado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
       },
     },
@@ -226,14 +233,16 @@ const verifyCodeSchema = {
       description: "Error de validación o token inválido",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
     401: {
       description: "Credenciales inválidas",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -264,6 +273,8 @@ const checkEmailSchema = {
       description: "Respuesta indicando si el email existe",
       type: "object",
       properties: {
+        code: { type: "string" },
+        message: { type: "string" },
         exists: { type: "boolean" },
       },
     },
@@ -271,7 +282,8 @@ const checkEmailSchema = {
       description: "Error de validación",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -302,6 +314,7 @@ const magicLinkGenerateSchema = {
       description: "Enlace mágico enviado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
       },
     },
@@ -309,7 +322,8 @@ const magicLinkGenerateSchema = {
       description: "Error de validación",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -323,6 +337,7 @@ const refreshTokenSchema = {
       description: "Token renovado exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         user: {
           type: "object",
@@ -340,7 +355,8 @@ const refreshTokenSchema = {
       description: "Refresh token inválido o expirado",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -354,6 +370,7 @@ const logoutSchema = {
       description: "Sesión cerrada exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
       },
     },
@@ -373,18 +390,19 @@ const deleteAccountSchema = {
       description: "Cuenta eliminada exitosamente",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
       },
     },
     401: {
       description: "Token inválido o no proporcionado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
     404: {
       description: "Usuario no encontrado",
       type: "object",
-      properties: { error: { type: "string" } },
+      properties: errorResponseSchema.properties,
     },
   },
 };
@@ -453,6 +471,7 @@ const verifyMagicTokenSchema = {
       description: "Acceso exitoso con token mágico",
       type: "object",
       properties: {
+        code: { type: "string" },
         message: { type: "string" },
         user: {
           type: "object",
@@ -470,14 +489,16 @@ const verifyMagicTokenSchema = {
       description: "Token mágico inválido o expirado",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
     401: {
       description: "Credenciales inválidas",
       type: "object",
       properties: {
-        error: { type: "string" },
+        code: { type: "string" },
+        message: { type: "string" },
       },
     },
   },
@@ -492,7 +513,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post<LoginRequest>(
     "/auth/login",
     {
-      config: { rateLimit: { max: 3, timeWindow: "10 minutes" } },
+      config: { rateLimit: { max: 5, timeWindow: "10 minutes" } },
       schema: loginSchema,
     },
     login,

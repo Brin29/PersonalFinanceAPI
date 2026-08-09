@@ -10,6 +10,7 @@ import {
   editCategory,
   listCategories,
 } from "../services/category.service";
+import { SUCCESS_CODES } from "../errors/responseCodes";
 
 function getUserId(request: FastifyRequest) {
   return (request as any).user.id as string;
@@ -23,7 +24,11 @@ export async function getCategoriesHandler(
 
   const { categories } = await listCategories(userId);
 
-  return reply.send({ categories });
+  return reply.send({
+    code: SUCCESS_CODES.CATEGORIES_LISTED.code,
+    message: SUCCESS_CODES.CATEGORIES_LISTED.message,
+    categories,
+  });
 }
 
 export async function createCategoryHandler(
@@ -36,7 +41,8 @@ export async function createCategoryHandler(
   const { category } = await createCategory(userId, data);
 
   return reply.status(201).send({
-    message: "Categoría creada exitosamente",
+    code: SUCCESS_CODES.CATEGORY_CREATED.code,
+    message: SUCCESS_CODES.CATEGORY_CREATED.message,
     category,
   });
 }
@@ -52,7 +58,8 @@ export async function editCategoryHandler(
   const { category } = await editCategory(userId, categoryId, data);
 
   return reply.send({
-    message: "Categoría actualizada exitosamente",
+    code: SUCCESS_CODES.CATEGORY_UPDATED.code,
+    message: SUCCESS_CODES.CATEGORY_UPDATED.message,
     category,
   });
 }
@@ -66,5 +73,8 @@ export async function deleteCategoryHandler(
 
   await deleteCategory(userId, categoryId);
 
-  return reply.send({ message: "Categoría eliminada exitosamente" });
+  return reply.send({
+    code: SUCCESS_CODES.CATEGORY_DELETED.code,
+    message: SUCCESS_CODES.CATEGORY_DELETED.message,
+  });
 }

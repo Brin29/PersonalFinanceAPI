@@ -13,6 +13,7 @@ import {
   getTransactionSummary,
   listTransactions,
 } from "../services/transaction.service";
+import { SUCCESS_CODES } from "../errors/responseCodes";
 
 function getUserId(request: FastifyRequest) {
   return (request as any).user.id as string;
@@ -28,7 +29,8 @@ export async function createTransactionHandler(
   const { transaction } = await createTransaction(userId, data);
 
   return reply.status(201).send({
-    message: "Transacción creada exitosamente",
+    code: SUCCESS_CODES.TRANSACTION_CREATED.code,
+    message: SUCCESS_CODES.TRANSACTION_CREATED.message,
     transaction,
   });
 }
@@ -44,7 +46,8 @@ export async function editTransactionHandler(
   const { transaction } = await editTransaction(userId, transactionId, data);
 
   return reply.send({
-    message: "Transacción actualizada exitosamente",
+    code: SUCCESS_CODES.TRANSACTION_UPDATED.code,
+    message: SUCCESS_CODES.TRANSACTION_UPDATED.message,
     transaction,
   });
 }
@@ -58,7 +61,10 @@ export async function deleteTransactionHandler(
 
   await deleteTransaction(userId, transactionId);
 
-  return reply.send({ message: "Transacción eliminada exitosamente" });
+  return reply.send({
+    code: SUCCESS_CODES.TRANSACTION_DELETED.code,
+    message: SUCCESS_CODES.TRANSACTION_DELETED.message,
+  });
 }
 
 export async function getTransactionsHandler(
@@ -72,7 +78,12 @@ export async function getTransactionsHandler(
     request.query,
   );
 
-  return reply.send({ transactions, pagination });
+  return reply.send({
+    code: SUCCESS_CODES.TRANSACTIONS_LISTED.code,
+    message: SUCCESS_CODES.TRANSACTIONS_LISTED.message,
+    transactions,
+    pagination,
+  });
 }
 
 export async function getSummaryHandler(
@@ -84,5 +95,11 @@ export async function getSummaryHandler(
 
   const { summary, byMonth, byDay } = await getTransactionSummary(userId, period);
 
-  return reply.send({ summary, byMonth, byDay });
+  return reply.send({
+    code: SUCCESS_CODES.SUMMARY_GENERATED.code,
+    message: SUCCESS_CODES.SUMMARY_GENERATED.message,
+    summary,
+    byMonth,
+    byDay,
+  });
 }

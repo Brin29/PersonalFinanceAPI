@@ -4,11 +4,12 @@ import User from "../schema/user.schema";
 import { generateTokens } from "../utils/token.utils";
 import { EmailService } from "../utils/email.utils";
 import { env } from "../env";
+import { AppError } from "../errors/app.error";
 
 export async function generateMagicLink(email: string) {
   const existingUser = await User.findOne({ email });
 
-  if (!existingUser) throw { status: 404, message: "Usuario no encontrado" };
+  if (!existingUser) throw new AppError("USER_NOTFOUND");
 
   await MagicLink.deleteMany({
     userId: existingUser._id,
@@ -43,13 +44,13 @@ export async function verifyMagicLink(magicToken: string) {
     used: false,
   });
 
-  if (!magicLink) throw { status: 401, message: "Token inválido o expirado" };
+  if (!magicLink) throw new AppError("MAGIC_TOKEN_INVALID_OR_EXPIRED");
 
   magicLink.used = true;
   await magicLink.save();
 
   const user = await User.findById(magicLink.userId);
-  if (!user) throw { status: 404, message: "Usuario no encontrado" };
+  if (!user) throw new AppError("USER_NOTFOUND");
 
   return { tokens: generateTokens(user), user };
 }

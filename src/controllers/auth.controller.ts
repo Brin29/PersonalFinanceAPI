@@ -38,6 +38,7 @@ import {
 import { parseOAuthState } from "../utils/oauthState.utils";
 
 import { env } from "../env";
+import { ERROR_CODES, SUCCESS_CODES } from "../errors/responseCodes";
 
 function oauthSuccessRedirect(request: FastifyRequest): string {
   const query = request.query as Record<string, string | undefined>;
@@ -67,7 +68,8 @@ export async function register(
   setAuthCookies(reply, tokens);
 
   return reply.status(201).send({
-    message: "Usuario registrado exitosamente",
+    code: SUCCESS_CODES.USER_REGISTERED.code,
+    message: SUCCESS_CODES.USER_REGISTERED.message,
     user: {
       id: user._id,
       firstName: user.firstName,
@@ -149,7 +151,8 @@ export async function login(
   setAuthCookies(reply, tokens);
 
   return reply.send({
-    message: "Inicio de sesión exitoso",
+    code: SUCCESS_CODES.LOGIN_SUCCESS.code,
+    message: SUCCESS_CODES.LOGIN_SUCCESS.message,
     user: {
       id: user._id,
       firstName: user.firstName,
@@ -166,7 +169,8 @@ export async function logout(_: unknown, reply: FastifyReply) {
   clearAuthCookies(reply);
 
   return reply.send({
-    message: "Sesión cerrada exitosamente",
+    code: SUCCESS_CODES.LOGOUT_SUCCESS.code,
+    message: SUCCESS_CODES.LOGOUT_SUCCESS.message,
   });
 }
 
@@ -181,7 +185,8 @@ export async function deleteAccount(
   clearAuthCookies(reply);
 
   return reply.send({
-    message: "Cuenta eliminada exitosamente",
+    code: SUCCESS_CODES.ACCOUNT_DELETED.code,
+    message: SUCCESS_CODES.ACCOUNT_DELETED.message,
   });
 }
 
@@ -195,10 +200,14 @@ export async function checkEmail(
 
   if (existingUser) {
     return reply.status(200).send({
+      code: SUCCESS_CODES.EMAIL_CHECKED.code,
+      message: SUCCESS_CODES.EMAIL_CHECKED.message,
       exists: true,
     });
   } else {
     return reply.status(200).send({
+      code: SUCCESS_CODES.EMAIL_CHECKED.code,
+      message: SUCCESS_CODES.EMAIL_CHECKED.message,
       exists: false,
     });
   }
@@ -212,7 +221,8 @@ export async function magicLinkGenerate(
   await generateMagicLink(email);
 
   return reply.status(200).send({
-    message: "Se ha enviado un enlace de acceso a su correo electrónico",
+    code: SUCCESS_CODES.MAGIC_LINK_SENT.code,
+    message: SUCCESS_CODES.MAGIC_LINK_SENT.message,
   });
 }
 
@@ -224,8 +234,9 @@ export async function codeGenerate(
   const { code } = await generateCode(email);
 
   return reply.status(200).send({
-    code: code,
-    message: "Codigo enviado exitosamente",
+    code: SUCCESS_CODES.CODE_SENT.code,
+    message: SUCCESS_CODES.CODE_SENT.message,
+    otpCode: code,
   });
 }
 
@@ -239,7 +250,8 @@ export async function verifyCode(
   setVerificationCookie(reply, verificationToken);
 
   return reply.status(200).send({
-    message: "Código verificado exitosamente",
+    code: SUCCESS_CODES.CODE_VERIFIED.code,
+    message: SUCCESS_CODES.CODE_VERIFIED.message,
   });
 }
 
@@ -253,7 +265,10 @@ export async function refresh(
     body?.data?.refresh_token;
 
   if (!refresh_token) {
-    return reply.status(401).send({ error: "Refresh token no proporcionado" });
+    return reply.status(ERROR_CODES.REFRESH_TOKEN_REQUIRED.status).send({
+      code: ERROR_CODES.REFRESH_TOKEN_REQUIRED.code,
+      message: ERROR_CODES.REFRESH_TOKEN_REQUIRED.message,
+    });
   }
 
   const { tokens, user } = await refreshUserToken(refresh_token);
@@ -261,7 +276,8 @@ export async function refresh(
   setAuthCookies(reply, tokens);
 
   return reply.send({
-    message: "Token renovado exitosamente",
+    code: SUCCESS_CODES.TOKEN_REFRESHED.code,
+    message: SUCCESS_CODES.TOKEN_REFRESHED.message,
     user: {
       id: user._id,
       firstName: user.firstName,
@@ -282,7 +298,8 @@ export async function verifyMagicToken(
   setAuthCookies(reply, tokens);
 
   return reply.send({
-    message: "Login exitoso",
+    code: SUCCESS_CODES.MAGIC_LOGIN_SUCCESS.code,
+    message: SUCCESS_CODES.MAGIC_LOGIN_SUCCESS.message,
     user: {
       id: user._id,
       firstName: user.firstName,
