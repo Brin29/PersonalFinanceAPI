@@ -102,7 +102,7 @@ export class EmailService {
 
       to: email,
 
-      subject: "Enlace de acceso a DevPulse",
+      subject: "Enlace de acceso a Finance",
 
       html: `
       <div
@@ -120,7 +120,7 @@ export class EmailService {
             font-size: 24px;
           "
         >
-          Acceso a DevPulse
+          Acceso a Finance
         </h1>
 
         <p
@@ -153,7 +153,7 @@ export class EmailService {
               font-weight: bold;
             "
           >
-            Acceder a DevPulse
+            Acceder a Finance
           </a>
         </div>
 
@@ -189,7 +189,7 @@ export class EmailService {
     await transporter.sendMail({
       from: process.env.MAIL_FROM,
       to: email,
-      subject: `Invitación a ${teamName} - DevPulse`,
+      subject: `Invitación a ${teamName} - Finance`,
       html: `
       <div
         style="
@@ -215,7 +215,7 @@ export class EmailService {
           "
         >
           <strong>${invitedByName}</strong> te ha invitado a unirte al equipo
-          <strong>${teamName}</strong> en DevPulse.
+          <strong>${teamName}</strong> en Finance.
         </p>
 
         <div

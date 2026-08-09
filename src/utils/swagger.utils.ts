@@ -7,8 +7,8 @@ export async function registerSwagger(fastify: FastifyInstance) {
   await fastify.register(fastifySwagger, {
     openapi: {
       info: {
-        title: "DevPulse API",
-        description: "API de DevPulse - Sistema de gestión de proyectos",
+        title: "Finance API",
+        description: "API de Finance - Sistema de gestión de proyectos",
         version: "1.0.0",
       },
       servers: [

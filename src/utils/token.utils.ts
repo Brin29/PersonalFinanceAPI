@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 
 export const JWT_SECRET =
-  process.env.JWT_SECRET || "devpulse_secret_key_change_in_production";
+  process.env.JWT_SECRET || "Finance_secret_key_change_in_production";
 export const JWT_REFRESH_SECRET =
   process.env.JWT_REFRESH_SECRET ||
-  "devpulse_refresh_secret_key_change_in_production";
+  "Finance_refresh_secret_key_change_in_production";
 
 export function verifyRefreshToken(token: string) {
   return jwt.verify(token, JWT_REFRESH_SECRET) as {
