@@ -146,6 +146,13 @@ export const ERROR_CODES = {
     message: "Debe proporcionar un nombre para actualizar",
     description: "El nombre de la categoría es obligatorio.",
   },
+  CATEGORY_NAME_TAKEN: {
+    status: 400,
+    code: "CATEGORY_NAME_TAKEN",
+    message: "Ya existe una categoría con este nombre",
+    description:
+      "El nombre de la categoría ya está en uso por otra categoría del usuario.",
+  },
   CATEGORY_NOTFOUND: {
     status: 404,
     code: "CATEGORY_NOTFOUND",

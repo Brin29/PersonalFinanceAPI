@@ -64,6 +64,45 @@ async function isKeyTaken(userId: string, key: string): Promise<boolean> {
   return Boolean(existing);
 }
 
+async function isNameTaken(
+  userId: string,
+  name: string,
+  options: { excludeKey?: string; excludeId?: Types.ObjectId } = {},
+): Promise<boolean> {
+  const normalized = slugify(name);
+  const userObjectId = toObjectId(userId);
+
+  const userCategories = await Category.find({
+    user: userObjectId,
+    isSystem: false,
+  }).lean();
+
+  const hiddenSystemKeys = new Set(
+    userCategories
+      .filter(
+        (category) =>
+          category.isDeleted && SYSTEM_CATEGORY_KEYS.includes(category.key),
+      )
+      .map((category) => category.key),
+  );
+
+  const systemNameTaken = SYSTEM_CATEGORIES.some(
+    (category) =>
+      !hiddenSystemKeys.has(category.key) &&
+      slugify(category.name) === normalized,
+  );
+
+  if (systemNameTaken) return true;
+
+  return userCategories.some(
+    (category) =>
+      !category.isDeleted &&
+      category.key !== options.excludeKey &&
+      !category._id.equals(options.excludeId) &&
+      slugify(category.name) === normalized,
+  );
+}
+
 async function generateUniqueKey(
   userId: string,
   name: string,
@@ -141,6 +180,12 @@ export async function createCategory(
       message: `Tipo de categoría inválido. Valores permitidos: ${CATEGORY_TYPES.join(", ")}`,
     });
 
+  if (await isNameTaken(userId, data.name)) {
+    throw new AppError("CATEGORY_NAME_TAKEN", {
+      message: `Ya existe una categoría con el nombre "${data.name}".`,
+    });
+  }
+
   const key = await generateUniqueKey(userId, data.name);
 
   const category = await Category.create({
@@ -171,6 +216,12 @@ export async function editCategory(
   const category = await Category.findById(toObjectId(categoryId)).lean();
 
   if (!category) throw new AppError("CATEGORY_NOTFOUND");
+
+  if (await isNameTaken(userId, data.name, { excludeKey: category.key })) {
+    throw new AppError("CATEGORY_NAME_TAKEN", {
+      message: `Ya existe una categoría con el nombre "${data.name}".`,
+    });
+  }
 
   if (category.isSystem) {
     const override = await Category.findOneAndUpdate(
